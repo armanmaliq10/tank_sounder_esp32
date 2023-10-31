@@ -167,20 +167,6 @@ void setup()
   NimBLEDevice::setPower(9); /** +9db */
 #endif
 
-  /** Set the IO capabilities of the device, each option will trigger a different pairing method.
-   *  BLE_HS_IO_DISPLAY_ONLY    - Passkey pairing
-   *  BLE_HS_IO_DISPLAY_YESNO   - Numeric comparison pairing
-   *  BLE_HS_IO_NO_INPUT_OUTPUT - DEFAULT setting - just works pairing
-   */
-  // NimBLEDevice::setSecurityIOCap(BLE_HS_IO_DISPLAY_ONLY); // use passkey
-  // NimBLEDevice::setSecurityIOCap(BLE_HS_IO_DISPLAY_YESNO); //use numeric comparison
-
-  /** 2 different ways to set security - both calls achieve the same result.
-   *  no bonding, no man in the middle protection, secure connections.
-   *
-   *  These are the default values, only shown here for demonstration.
-   */
-  // NimBLEDevice::setSecurityAuth(false, false, true);
   NimBLEDevice::setSecurityAuth(/*BLE_SM_PAIR_AUTHREQ_BOND | BLE_SM_PAIR_AUTHREQ_MITM |*/ BLE_SM_PAIR_AUTHREQ_SC);
 
   pServer = NimBLEDevice::createServer();
@@ -199,11 +185,6 @@ void setup()
   pBeefCharacteristic->setValue("Burger");
   pBeefCharacteristic->setCallbacks(&chrCallbacks);
 
-  /** 2904 descriptors are a special case, when createDescriptor is called with
-   *  0x2904 a NimBLE2904 class is created with the correct properties and sizes.
-   *  However we must cast the returned reference to the correct type as the method
-   *  only returns a pointer to the base NimBLEDescriptor class.
-   */
   NimBLE2904 *pBeef2904 = (NimBLE2904 *)pBeefCharacteristic->createDescriptor("2904");
   pBeef2904->setFormat(NimBLE2904::FORMAT_UTF8);
   pBeef2904->setCallbacks(&dscCallbacks);
