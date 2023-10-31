@@ -199,11 +199,6 @@ void setup()
   pFoodCharacteristic->setValue("Fries");
   pFoodCharacteristic->setCallbacks(&chrCallbacks);
 
-  /** Note a 0x2902 descriptor MUST NOT be created as NimBLE will create one automatically
-   *  if notification or indication properties are assigned to a characteristic.
-   */
-
-  /** Custom descriptor: Arguments are UUID, Properties, max length in bytes of the value */
   NimBLEDescriptor *pC01Ddsc = pFoodCharacteristic->createDescriptor(
       "C01D",
       NIMBLE_PROPERTY::READ |
