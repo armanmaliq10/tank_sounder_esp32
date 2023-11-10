@@ -55,7 +55,7 @@ class ServerCallbacks : public NimBLEServerCallbacks
     Serial.println("Starting BLE work!");
   };
 };
-void splitString(const String &input, const String &separator, String &part1, String &part2, String &part3)
+void splitString(const String &input, const String &separator, String &part1, String &part2, String &part3, String &part4)
 {
   int separatorPos1 = input.indexOf(separator);
   if (separatorPos1 != -1)
@@ -65,9 +65,37 @@ void splitString(const String &input, const String &separator, String &part1, St
     if (separatorPos2 != -1)
     {
       part2 = input.substring(separatorPos1 + separator.length(), separatorPos2);
-      part3 = input.substring(separatorPos2 + separator.length());
+      int separatorPos3 = input.indexOf(separator, separatorPos2 + separator.length());
+      if (separatorPos3 != -1)
+      {
+        part3 = input.substring(separatorPos2 + separator.length(), separatorPos3);
+        part4 = input.substring(separatorPos3 + separator.length());
+      }
+      else
+      {
+        // If there is no third separator, extract the remaining part as part3
+        part3 = input.substring(separatorPos2 + separator.length());
+      }
     }
   }
+}
+String twoDigits(int number)
+{
+  if (number < 10)
+  {
+    return "0" + String(number);
+  }
+  else
+  {
+    return String(number);
+  }
+}
+String parseAndFormatDateTime(const String &dateTimeString)
+{
+  int year, month, day, hour, minute, second;
+  sscanf(dateTimeString.c_str(), "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
+  String formattedDate = String(year) + "-" + twoDigits(month) + "-" + twoDigits(day) + " " + twoDigits(hour) + ":" + twoDigits(minute);
+  return formattedDate;
 }
 
 /** Handler class for characteristic actions */
@@ -87,14 +115,16 @@ class CharacteristicCallbacks : public NimBLECharacteristicCallbacks
     {
       // INDIKASI START
       input = input.substring(10);
-      String namaPetugas, namaTangki, noNIK;
-      splitString(input, "***", namaPetugas, namaTangki, noNIK);
+      String namaPetugas, namaTangki, noNIK, datePengukuran;
+      splitString(input, "***", namaPetugas, namaTangki, noNIK, datePengukuran);
       Serial.print("Nama Petugas: ");
       Serial.println(namaPetugas);
       Serial.print("Nama Tangki: ");
       Serial.println(namaTangki);
       Serial.print("No. NIK: ");
       Serial.println(noNIK);
+      Serial.print("datePengukuran: ");
+      Serial.println(parseAndFormatDateTime(datePengukuran));
     }
     // INDIKASI KALIBRASI
     else if (input.startsWith("diameter:"))
@@ -129,7 +159,7 @@ class CharacteristicCallbacks : public NimBLECharacteristicCallbacks
     Serial.println(str);
   };
 
-  void onSubscribe(NimBLECharacteristic *pCharacteristic, ble_gap_conn_desc *desc, uint16_t subValue){};
+  void onSubscribe(NimBLECharacteristic *pCharacteristic, ble_gap_conn_desc *desc, uint16_t subValues){};
 };
 
 /** Handler class for descriptor actions */
